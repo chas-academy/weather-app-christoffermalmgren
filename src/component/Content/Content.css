@@ -1,0 +1,29 @@
+.App-content {
+    min-height: 80vh;
+}
+
+.table {
+    margin-top: 50px;
+    width: 30%;  
+    margin: auto; 
+}
+
+hr{
+    width: 80px;
+
+}
+
+button{
+    margin-top: 20px;
+}
+
+input{
+    margin-top: 20px;
+}
+
+.forecast{
+    display: flex;
+    display: inline-block;
+    flex-wrap: wrap;
+}
+

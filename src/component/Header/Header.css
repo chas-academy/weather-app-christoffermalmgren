@@ -1,0 +1,19 @@
+.App-logo {
+    height: 80px;
+}
+
+.App-header {
+    background-image: url('https://images.pexels.com/photos/417045/pexels-photo-417045.jpeg?w=940&h=650&dpr=2&auto=compress&cs=tinysrgb') ;
+    height: 150px;
+    padding: 20px;
+    color: white;
+}
+
+.App-title {
+    font-size: 1.5em;
+}
+
+.fa-sun{
+    color: yellow;
+    
+}
