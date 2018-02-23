@@ -42,7 +42,7 @@ class Form extends Component {
       unitLocation: res.name,
       unitWeather: res.main
     })
-    console.log(res.name);
+    console.log(res);
     console.log();
   })
 
@@ -153,7 +153,6 @@ class Form extends Component {
             <h3 className='location'>Your Location</h3>
             <h5 className="card-text">{this.state.unitWeather.temp} Celsius</h5>
             <h5 className="card-text">Your position right now is: {this.state.unitLocation.toUpperCase()}</h5>
-            <p className="card-text">{}</p>
           </div>
         </div>
         <form onSubmit={this.onSubmit.bind(this)}>
@@ -170,7 +169,7 @@ class Form extends Component {
         { fiveDayForeCast }
         { this.state.weather.length > 0 ? 
           <div className="App-weather">  
-            <p>Weather Today:</p>
+            <h4>Weather Today:</h4>
             <img src={`http://openweathermap.org/img/w/${this.state.weather[0].icon}.png`} title="Title goes here" alt="A weather icon, describing the... weather" />
             <p>
               {this.state.weather[0].description}
