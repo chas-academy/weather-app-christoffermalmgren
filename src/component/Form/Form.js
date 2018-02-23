@@ -9,6 +9,10 @@ class Form extends Component {
       wind: [],
       sys: [],
       forecast: [],
+      long: 0,
+      lat: 0,
+      unitLocation: '',
+      unitWeather: [],
       temperature: {
         celcius: null,
         farenheit: null
@@ -17,6 +21,32 @@ class Form extends Component {
     }
   }
 
+  componentWillMount() {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      this.setState({
+        long: pos.coords.longitude.toFixed(5),
+        lat: pos.coords.latitude.toFixed(5)
+
+        
+      })
+      this.getWeather();
+    })
+  }
+
+  getWeather(){ 
+  
+  fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.state.lat}&lon=${this.state.long}&units=metric&APPID=4686d7caa20155951ba2c981145ba19b`)
+  .then(res => res.json())
+  .then(res => {
+    this.setState({
+      unitLocation: res.name,
+      unitWeather: res.main
+    })
+    console.log(res.name);
+    console.log();
+  })
+
+  }
   onSubmit(e) {
     e.preventDefault();
 
@@ -32,8 +62,6 @@ class Form extends Component {
           main: res.main,
           wind:res.wind,
           sys: res.sys
-        }, function() {
-          console.log('Hopefully we have some weather', this.state.weather, this.state.wind, this.state.main, this.state.sys);
         })
       });
       
@@ -41,9 +69,10 @@ class Form extends Component {
       .then(res => res.json())
       .then(res => {
         this.setState({
-          forecast: res.list.filter(item => item.dt_txt.endsWith('12:00:00')|| item.dt_txt.endsWith('00:00:00'))
+          forecast: res.list.filter(item => item.dt_txt.endsWith('12:00:00'))
         });
       })
+
   }
 
 
@@ -51,7 +80,7 @@ class Form extends Component {
   handleChangeUnit(e) {
     this.setState({
       unit: e.target.value
-    }, function() {
+    }, function() { 
       this.recalculateTemperature(this.state.unit);
     });
   }
@@ -60,7 +89,7 @@ class Form extends Component {
     console.log(unit);
     switch (unit) {
       case 'metric':
-        debugger;
+        
         // Vi kan inte utgå från att this.main.temp är celcius
         let celcius = !this.state.temperature.celcius 
           ? this.state.main.temp - 32 * 5/9 
@@ -76,7 +105,7 @@ class Form extends Component {
       case 'imperial':
         // Om man söker på Oslo med Farenheit blir detta omkastat fel.
         // Kolla i this.state.temperature om celcius är null
-        debugger;
+        
         let farenheit = this.state.main.temp * 9/5 + 32;
         console.log(this.state.main.temp, farenheit)
         this.setState({
@@ -96,21 +125,37 @@ class Form extends Component {
 
   render() {
     const { forecast } = this.state;
-    console.log(forecast)
+    
 
     const fiveDayForeCast = forecast.map((hour, index) => {
       const icon = `http://openweathermap.org/img/w/${hour.weather[0].icon}.png`
       return (
-        <div className="forecast" key={index}>
-          <span>{hour.dt_txt.substring(0, 16)}</span> <span>{hour.main.temp}</span>
-          <img src={icon} />
-        </div>
+        <div className="container">
+           <div className="row" key={index}>
+              <div className="col-lg-12">
+                <div>Date: {hour.dt_txt.substring(0, 10)}</div>
+                <div>Time: {hour.dt_txt.substring(10, 16)}</div>
+                 <div>Degrees:  {Math.round(hour.main.temp)}</div> 
+                <img src={icon} /> 
+              </div>
+            </div>
+        </div> 
       ) 
     });
+
+  
 
     return (
 
       <div>
+        <div className='card'>
+          <div className="card-body">
+            <h3 className='location'>Your Location</h3>
+            <h5 className="card-text">{this.state.unitWeather.temp} Celsius</h5>
+            <h5 className="card-text">Your position right now is: {this.state.unitLocation.toUpperCase()}</h5>
+            <p className="card-text">{}</p>
+          </div>
+        </div>
         <form onSubmit={this.onSubmit.bind(this)}>
           <input type="text" placeholder="City name here..." name="city" /> <br/>   
           <button className="btn btn-default"type="submit">Get weather</button>
@@ -120,6 +165,7 @@ class Form extends Component {
             <input name="group100" type="radio" id="radio101" value="imperial" onChange={this.handleChangeUnit.bind(this)}/>
             <label htmlFor="radio101">Farenheit</label>
         </div>
+
         </form>
         { fiveDayForeCast }
         { this.state.weather.length > 0 ? 
@@ -146,23 +192,23 @@ class Form extends Component {
             
               
                 <tr>
-                  <th scope="row">Wind:</th>
+                  <th scope="row"> <img src="https://png.icons8.com/metro/50/000000/tornado.png"/> Wind:</th>
                   <td>{this.state.wind.speed} m/s</td>
                 </tr>
                 <tr>
-                  <th scope="row">Pressure:</th>
+                  <th scope="row"> <img src="https://png.icons8.com/metro/50/000000/atmospheric-pressure.png"/> Pressure:</th>
                   <td>{this.state.main.pressure}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Humidity:</th>
+                  <th scope="row"> <img src="https://png.icons8.com/metro/50/000000/humidity.png"/> Humidity:</th>
                   <td>{this.state.main.humidity}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Sunrise:</th>
+                  <th scope="row"> <img src="https://png.icons8.com/metro/50/000000/sunrise.png"/> Sunrise:</th>
                   <td>{this.calculateTime(this.state.sys.sunrise)}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Sunset:</th>
+                  <th scope="row"><img src="https://png.icons8.com/metro/50/000000/sunset.png"/> Sunset:</th>
                   <td>{this.calculateTime(this.state.sys.sunset)}</td>
                 </tr>
          </tbody>
